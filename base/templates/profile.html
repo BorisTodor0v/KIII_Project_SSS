@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container mt-3">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="text-center mb-3">
+        {% if user_info.profile_image %}
+          <img src="{{ user_info.profile_image.url }}" alt="Profile Image" class="img-fluid">
+        {% else %}
+          <img src="{{ MEDIA_URL }}profile_images/default_profile_image.jpg" alt="Default Profile Image" class="img-fluid">
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-md-8">
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" class="form-control" id="username" name="username" value="{{ user_info.user.username }}" readonly>
+        </div>
+        <div>
+          <label for="bio" class="form-label">Bio</label>
+          <input type="text" class="form-control" id="bio" name="bio" value="{{ user_info.bio }}" readonly>
+        </div>
+        {% if is_owner %}
+          <div class="mb-3">
+            <label for="first_name" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="last_name" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" readonly>
+          </div>
+          <div>
+            <a href="{% url 'Edit_Profile' %}" id="editProfileButton" class="btn btn-danger mt-2">Edit Profile</a>
+          </div>
+        {% endif %}
+    </div>
+  </div>
+
+
+<div class="container mt-2">
+    {% if products %}
+    <h2>Showing {{ products.paginator.count }} products sold by this user</h2>
+        {% for product in products %}
+            <div class="row">
+                <div class="col-md-4">
+                    {% if product.productimage_set.first %}
+                        <img src="{{ product.productimage_set.first.image.url }}" alt="Product Image" class="img-fluid">
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <h3>{{ product.name }}</h3>
+                    <h5>{{ product.racing_series }} - {{ product.team }} - {{ product.category }}</h5>
+                    <p>Price: ${{ product.price|intcomma }} | Stock: {{ product.stock|intcomma }}</p>
+                    <p class="text-truncate">{{ product.description }}</p>
+                    <a href="{% url 'Product' product_id=product.id %}" class="btn btn-danger">View Details</a>
+                    {% if is_owner %}
+                        <a href="{% url 'Edit_Product' product_id=product.id %}" class="btn btn-primary">Edit Product</a>
+                    {% endif %}
+                </div>
+            </div>
+            <hr>
+        {% endfor %}
+
+        <nav aria-label="Search Results Pagination">
+            <ul class="pagination justify-content-center">
+                {% if products.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&laquo;</span>
+                    </li>
+                {% endif %}
+
+                {% for num in products.paginator.page_range %}
+                    {% if products.number == num %}
+                        <li class="page-item active" aria-current="page">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if products.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&raquo;</span>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+
+</div>
+
+
+{% endblock %}

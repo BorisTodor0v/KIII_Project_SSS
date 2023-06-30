@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Speed & Sport Souvenirs</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <header class="p-3 text-bg-danger">
+      <div class="container">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+          <a href="{% url 'Home' %}" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+            <img src="{{ MEDIA_URL }}other_media/checkered_flag_logo.png" alt="Image" class="bi me-2" width="40" height="32" role="img"/>
+          </a>
+
+          <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+            <li><a href="{% url 'Home' %}" class="nav-link px-2 text-white">Home</a></li>
+            <li><a href="{% url 'Products' %}" class="nav-link px-2 text-white">Products</a></li>
+            <li><a href="{% url 'About' %}" class="nav-link px-2 text-white">About</a></li>
+
+
+            {% if user.is_authenticated %}
+              <li><a href="{% url 'Add_Product' %}" class="nav-link px-2 text-white">Sell Something</a></li>
+              <li><a class="nav-link px-2 text-white">Welcome, {{ user.username }}</a></li>
+              <li><a href="{% url 'Profile' user.id %}" class="nav-link px-2 text-white">My Profile</a></li>
+            {% endif %}
+          </ul>
+
+          {% if user.is_authenticated %}
+            <a href="{% url 'Cart' %}" class="btn btn-light mx-3">Your cart</a>
+          {% endif %}
+          <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex align-items-center" role="search" action="{% url 'Products' %}" method="GET">
+            <input type="text" name="query" class="form-control form-control-dark me-2" placeholder="Quick Search" aria-label="Search">
+            <button type="submit" class="btn btn-primary">Search</button>
+          </form>
+
+          <div class="text-end">
+            {% if user.is_authenticated %}
+              <button type="button" class="btn btn-outline-light" onclick="window.location.href={% url 'Logout' %}">Log out</button>
+            {% else %}
+              <button type="button" class="btn btn-outline-light me-2" onclick="window.location.href={% url 'Login' %}">Login</button>
+              <button type="button" class="btn btn-primary" onclick="window.location.href={% url 'Register' %}">Register</button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </header>
+
+    {% block content %}
+
+    {% endblock %}
+    <hr>
+    <div class="container mt-4 mb-0">
+      <footer class="py-5">
+      <div class="row">
+        <div class="col-6 col-md-2 mb-4">
+          <h5>Section</h5>
+          <ul class="nav flex-column">
+            <li class="nav-item mb-2"><a href="{% url 'Home' %}" class="nav-link p-0 text-body-secondary">Home</a></li>
+            <li class="nav-item mb-2"><a href="{% url 'Products' %}" class="nav-link p-0 text-body-secondary">Products</a></li>
+            <li class="nav-item mb-2"><a href="{% url 'About' %}" class="nav-link p-0 text-body-secondary">About</a></li>
+            <li class="nav-item mb-2"><a href="{% url 'Legal' %}" class="nav-link p-0 text-body-secondary">Disclaimer</a></li>
+          </ul>
+        </div>
+
+      <div class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top">
+        <p>© (or lack thereof) 2023 Борис Тодоров, 191096. No rights reserved.</p>
+        <ul class="list-unstyled d-flex">
+          <li class="ms-3 text-dark"><a class="link-body-emphasis" href="{% url 'tmp' %}"><svg class="bi" width="24" height="24"></svg></a></li>
+        </ul>
+      </div>
+      </footer>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block script %}
+    {% endblock %}
+</body>
+</html>

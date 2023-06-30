@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-3">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <h2>Editing profile for {{ user.username }}</h2>
+      <form method="POST" action="{% url 'Edit_Profile' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="first_name" class="form-label">Username</label>
+          <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}">
+        </div>
+        <div>
+          <label for="bio" class="form-label">Bio</label>
+          <input type="text" class="form-control" id="bio" name="bio" value="{{ user_info.bio }}">
+        </div>
+        <div class="mb-3">
+          <label for="first_name" class="form-label">First Name</label>
+          <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}">
+        </div>
+        <div class="mb-3">
+          <label for="last_name" class="form-label">Last Name</label>
+          <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}">
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+        </div>
+        <div class="text-center mb-3">
+        {% if user_info.profile_image %}
+          <img src="{{ user_info.profile_image.url }}" alt="Profile Image" class="img-fluid">
+        {% else %}
+          <img src="{{ MEDIA_URL }}profile_images/default_profile_image.jpg" alt="Default Profile Image" class="img-fluid">
+        {% endif %}        </div>
+        <div class="mb-3">
+          <label for="profile_image" class="form-label">Profile Image</label>
+          <input type="file" class="form-control" id="profile_image" name="profile_image">
+        </div>
+          <div>
+            <button type="submit" class="btn btn-danger">Save Changes</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

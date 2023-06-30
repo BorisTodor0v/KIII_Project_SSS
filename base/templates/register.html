@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form action="{% url 'Register' %}" method="POST" class="container w-25">
+    <img class="d-block mx-auto mb-4" src="{{ MEDIA_URL }}other_media/checkered_flag_logo.png" alt="" width="72" height="57">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="d-flex justify-content-center">
+        <button type="submit" class="btn btn-primary px-4">Register</button>
+    </div>
+</form>
+{% endblock %}

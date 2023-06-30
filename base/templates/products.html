@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="mx-5 px-5 mt-5">
+    <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex align-items-center" role="search" action="{% url 'Products' %}" method="GET">
+        <select name="racing_series" id="racing_series_select" class="form-select form-select-sm mx-2">
+            <option value="" selected>Select Racing Series</option>
+            {% for series in racing_series %}
+                <option value="{{ series.id }}">{{ series.name }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="team" id="team_select" class="form-select form-select-sm mx-2" disabled>
+            <option value="" selected disabled>Select Team</option>
+            {% for team in teams %}
+                <option value="{{ team.id }}" data-series="{{ team.racing_series_id }}">{{ team.name }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="category" class="form-select form-select-sm mx-2">
+            <option value="" selected>Select Category</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+
+        <input type="text" name="query" class="form-control form-control-dark me-2" placeholder="Search for..." aria-label="Search">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    <form class="d-inline-block">
+        <label for="per_page" class="form-label">Products per Page:</label>
+        <select name="per_page" id="per_page" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="10" {% if products_per_page == '10' %}selected{% endif %}>10</option>
+            <option value="20" {% if products_per_page == '25' %}selected{% endif %}>20</option>
+            <option value="50" {% if products_per_page == '50' %}selected{% endif %}>50</option>
+            <option value="100" {% if products_per_page == '100' %}selected{% endif %}>100</option>
+        </select>
+    </form>
+</div>
+
+<div class="container mt-2">
+    {% if products %}
+    <h2>Showing {{ products|length }} of {{ products.paginator.count }} products</h2>
+        {% for product in products %}
+            <div class="row">
+                <div class="col-md-4">
+                    {% if product.productimage_set.first %}
+                        <img src="{{ product.productimage_set.first.image.url }}" alt="Product Image" class="img-fluid">
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <h3>{{ product.name }}</h3>
+                    <h5>{{ product.racing_series }} - {{ product.team }} - {{ product.category }}</h5>
+                    <p>Price: ${{ product.price|intcomma }} | Sold by: <a href="{% url 'Profile' user_id=product.seller.user_id %}" class="text-dark text-decoration-none">{{ product.seller }}</a></p>
+                    <p class="text-truncate">{{ product.description }}</p>
+                    <a href="{% url 'Product' product_id=product.id %}" class="btn btn-danger">View Details</a>
+                </div>
+            </div>
+            <hr>
+        {% endfor %}
+
+        <nav aria-label="Search Results Pagination">
+            <ul class="pagination justify-content-center">
+                {% if products.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&laquo;</span>
+                    </li>
+                {% endif %}
+
+                {% for num in products.paginator.page_range %}
+                    {% if products.number == num %}
+                        <li class="page-item active" aria-current="page">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if products.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&raquo;</span>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% else %}
+        <div class="container">
+            <div class="random-products text-center">
+              <h4>We weren't quite able to find what you were looking for. In the meantime, why not check out something else?</h4>
+                <div class="row justify-content-center">
+                {% for product in random_products %}
+                <div class="col-md-2">
+                  <div class="card">
+                    <div class="card-body">
+                      {% if product.productimage_set.first %}
+                        <img src="{{ product.productimage_set.first.image.url }}" alt="Product Image" class="img-fluid">
+                      {% endif %}
+                      <h5 class="card-title">{{ product.name }}</h5>
+                      <p class="card-text text-truncate">{{ product.description }}</p>
+                      <a href="{% url 'Product' product.id %}" class="btn btn-primary">View Product</a>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+const racingSeriesSelect = document.getElementById('racing_series_select');
+const teamSelect = document.getElementById('team_select');
+const teams = Array.from(teamSelect.options);
+
+racingSeriesSelect.addEventListener('change', (event) => {
+    const selectedSeriesId = event.target.value;
+
+    teamSelect.innerHTML = '';
+    teamSelect.disabled = true;
+
+    teams.forEach((team) => {
+        const teamSeriesId = team.getAttribute('data-series');
+        if (teamSeriesId === selectedSeriesId || teamSeriesId === '') {
+            teamSelect.appendChild(team.cloneNode(true));
+        }
+    });
+
+    teamSelect.disabled = false;
+});
+</script>
+{% endblock %}

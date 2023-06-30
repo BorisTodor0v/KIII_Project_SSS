@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container">
+  <h1>Your cart:</h1>
+  {% if cart %}
+    {% if cart.items.all %}
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Image</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Subtotal</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in cart.items.all %}
+              <tr>
+                <td>
+                  <a href="{% url 'Product' product_id=item.product.id %}">{{ item.product.name }}</a>
+                </td>
+                <td>
+                  <a href="{% url 'Product' product_id=item.product.id %}">
+                    <img src="{{ item.product.productimage_set.first.image.url }}" alt="Product Image" class="img-thumbnail" width="100">
+                  </a>
+                </td>
+                <td>${{ item.product.price|intcomma }}</td>
+                <td>
+                  <div class="quantity">
+                    {% if item.quantity == item.product.stock %}
+                      <button class="btn btn-sm btn-danger" disabled>+</button>
+                    {% else %}
+                      <a href="{% url 'Increment' item.id %}"><button class="btn btn-sm btn-danger">+</button></a>
+                    {% endif %}
+
+                    <span class="quantity-value">{{ item.quantity }}</span>
+
+                    {% if item.quantity == 1 %}
+                      <a href="{% url 'Remove_From_Cart' item.id %}"><button class="btn btn-sm btn-danger">-</button></a>
+                    {% else %}
+                      <a href="{% url 'Decrement' item.id %}"><button class="btn btn-sm btn-danger">-</button></a>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>${{ item.subtotal|intcomma }}</td>
+                <td>
+                  <a href="{% url 'Remove_From_Cart' item.id %}"><button class="btn btn-sm btn-danger">Remove</button></a>
+                </td>
+              </tr>
+            {% endfor %}
+            <tr>
+              <td colspan="5">Total:</td>
+              <td>${{ cart.calculate_total|intcomma }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <form method="post" action="{% url 'Payment' %}" class="container w-50" novalidate>
+        {% csrf_token %}
+          {% if payment_failed %}
+            <div class="container mt-3">
+              <label class="text-danger">Payment failed. Please check your payment details and try again.</label>
+            </div>
+          {% endif %}
+        <h3>Payment Information:</h3>
+        <div class="form-group">
+          <label for="cc_number">Credit Card Number:</label>
+          <input type="text" class="form-control" id="cc_number" name="cc_number" placeholder="Must be 16 digits" required>
+        </div>
+        <div class="form-group">
+          <label for="expiration_date">Expiration Date:</label>
+          <input type="month" class="form-control" id="expiration_date" name="expiration_date" required>
+        </div>
+        <div class="form-group">
+          <label for="cvv">CVV:</label>
+          <input type="text" class="form-control" id="cvv" name="cvv" placeholder="3 Digit Security Code" required>
+        </div>
+        <button type="submit" class="btn btn-danger">Submit Payment</button>
+      </form>
+    {% else %}
+    <h4>There's nothing in your cart for now. Browse from our choice of
+      <a href="{% url 'Products' %}">available items</a> and add them here!</h4>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

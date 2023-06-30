@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div id="carousel" class="carousel slide" data-bs-ride="carousel">
+                <ol class="carousel-indicators">
+                    {% for image in images %}
+                    <ul data-bs-target="#carousel" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></ul>
+                    {% endfor %}
+                </ol>
+                <div class="carousel-inner">
+                    {% for image in images %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <img class="img-fluid" src="{{ image.image.url }}" alt="Product Image">
+                    </div>
+                    {% endfor %}
+                </div>
+                <a class="carousel-control-prev" href="#carousel" role="button" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carousel" role="button" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h1>{{ product.name }}</h1>
+            <h2>${{ product.price|intcomma }}</h2>
+            <h4>{{ product.racing_series }} - {{ product.team }} - {{ product.category }}</h4>
+            <p>Available stock: {{ product.stock|intcomma }} | Sold by: <a href="{% url 'Profile' user_id=product.seller.user_id %}" class="text-dark text-decoration-none">{{ product.seller }}</a></p>
+            <p>{{ product.description }}</p>
+            {% if user.is_authenticated %}
+                {% if in_cart %}
+                    {% if enable_add_to_cart %}
+                        <form method="post" action="{% url 'Add_To_Cart' product_id=product.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Add product to cart</button>
+                        </form>
+                    {% else %}
+                        <button class="btn btn-danger" disabled>Add product to cart</button>
+                    {% endif %}
+                {% else %}
+                    {% if product.stock > 0 %}
+                        <form method="post" action="{% url 'Add_To_Cart' product_id=product.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Add product to cart</button>
+                        </form>
+                    {% else %}
+                        <a href="#" class="btn btn-danger">Product is out of stock</a>
+                    {% endif %}
+                {% endif %}
+            {% else %}
+                <a href="#" class="btn btn-danger">You must be logged in to buy products</a>
+            {% endif %}
+            {% if is_owner or user.is_superuser %}
+                <a href="{% url 'Edit_Product' product_id=product.id %}" class="btn btn-primary my-2">Edit Product</a>
+                <a href="{% url 'Confirm_Delete' product_id=product.id %}" class="btn btn-warning my-2">Delete Product</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="random-products text-center">
+      <h3>Something we think you'd like</h3>
+        <div class="row justify-content-center">
+        {% for product in random_products %}
+        <div class="col-md-2">
+          <div class="card">
+            <div class="card-body">
+              {% if product.productimage_set.first %}
+                <img src="{{ product.productimage_set.first.image.url }}" alt="Product Image" class="img-fluid">
+              {% endif %}
+              <h5 class="card-title">{{ product.name }}</h5>
+              <p class="card-text text-truncate">{{ product.description }}</p>
+              <a href="{% url 'Product' product.id %}" class="btn btn-primary">View Product</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+</div>
+{% endblock %}
