@@ -4,9 +4,9 @@ services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_DB: Speed_Sport_Souvenirs
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -16,7 +16,7 @@ services:
     build: .
     command: >
       sh -c " python manage.py migrate &&
-              python manage.py createsuperuser --no-input --username admin --email admin@admin.com
+              python manage.py createsuperuser --no-input --username ${DJANGO_SUPERUSER_USERNAME} --email ${DJANGO_SUPERUSER_EMAIL}
               python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
@@ -24,15 +24,8 @@ services:
       - "8000:8000"
     depends_on:
       - db
-    environment:
-      DATABASE_NAME: Speed_Sport_Souvenirs
-      DATABASE_USER: postgres
-      DATABASE_PASSWORD: admin
-      DATABASE_HOST: db
-      DATABASE_PORT: 5432
-      DJANGO_SUPERUSER_USERNAME: admin
-      DJANGO_SUPERUSER_EMAIL: admin@admin.com
-      DJANGO_SUPERUSER_PASSWORD: admin
+    env_file:
+      - .env
 
 volumes:
   postgres_data:
