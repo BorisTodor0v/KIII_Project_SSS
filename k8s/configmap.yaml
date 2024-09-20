@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: django-config
+  namespace: speed-sport-souvenirs
+data:
+  DATABASE_NAME: Speed_Sport_Souvenirs
+  DATABASE_HOST: postgres
+  DATABASE_PORT: "5432"
+  DJANGO_SUPERUSER_USERNAME: admin
+  DJANGO_SUPERUSER_EMAIL: admin@admin.com

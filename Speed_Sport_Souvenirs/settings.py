@@ -83,7 +83,7 @@ DATABASES = {
         'NAME': os.getenv('DATABASE_NAME', 'Speed_Sport_Souvenirs'),
         'USER': os.getenv('DATABASE_USER', 'postgres'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD', 'admin'),
-        'HOST': os.getenv('DATABASE_HOST', 'db'),
+        'HOST': os.getenv('DATABASE_HOST'),
         'PORT': os.getenv('DATABASE_PORT', '5432')
     }
 }
